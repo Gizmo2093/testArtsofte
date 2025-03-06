@@ -1,0 +1,48 @@
+version: '3.1'
+
+services:
+  php:
+    image: php:8.2-fpm
+    build:
+      context: './../'
+      dockerfile: 'docker/php/Dockerfile'
+    working_dir: /var/www/app
+    volumes:
+      - ../:/var/www/app
+    container_name: php
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:1.14
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ../:/var/www/app
+    ports:
+      - "80:80"
+    container_name: nginx
+    depends_on:
+      - php
+    restart: unless-stopped
+
+  mariadb:
+    image: mariadb:10.11
+    container_name: mariadb
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      - MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
+      - MARIADB_DATABASE=${MARIADB_DATABASE}
+      - MARIADB_USER=${MARIADB_USER}
+      - MARIADB_PASSWORD=${MARIADB_PASSWORD}
+    volumes:
+      - mariadb-data:/var/lib/mysql
+
+  adminer:
+      image: adminer
+      container_name: adminer
+      restart: always
+      ports:
+        - "8080:8080"
+volumes:
+  mariadb-data:
