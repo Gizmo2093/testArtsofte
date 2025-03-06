@@ -23,8 +23,6 @@ RUN chown www-data:www-data /var/www
 COPY --chown=www-data:www-data ./ /app
 WORKDIR /app
 
-RUN composer install
-
 USER www-data
 
 CMD php-fpm
