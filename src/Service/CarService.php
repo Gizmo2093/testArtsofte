@@ -20,8 +20,9 @@ readonly class CarService
      */
     public function getCars(): ?array
     {
-        if($this->carRepository->findAll()) {
-            return array_map(fn($el) => $el?->getResponse(),$this->carRepository->findAll());
+        $cars = $this->carRepository->findAll();
+        if($cars) {
+            return array_map(fn($el) => $el?->getResponse(), $cars);
         }
         else return [];
     }
