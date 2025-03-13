@@ -11,5 +11,5 @@ interface CreditProgramRepositoryInterface
 {
     public function findOneById(int $id): ?CreditProgram;
 
-    public function save(LoanApplication $application): void;
+//    public function save(LoanApplication $application): void;
 }

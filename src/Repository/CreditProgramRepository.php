@@ -20,9 +20,9 @@ readonly class CreditProgramRepository implements CreditProgramRepositoryInterfa
         return $this->entityManager->getRepository(CreditProgram::class)->findOneBy(['id' => $id]);
     }
 
-    public function save(LoanApplication $application): void
-    {
-        $this->entityManager->persist($application);
-        $this->entityManager->flush();
-    }
+//    public function save(LoanApplication $application): void
+//    {
+//        $this->entityManager->persist($application);
+//        $this->entityManager->flush();
+//    }
 }

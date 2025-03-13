@@ -16,15 +16,12 @@ readonly class CarService
     }
 
     /**
-     * @return array<mixed>|null
+     * @return array<mixed>
      */
-    public function getCars(): ?array
+    public function getCars(): array
     {
         $cars = $this->carRepository->findAll();
-        if($cars) {
-            return array_map(fn($el) => $el?->getResponse(), $cars);
-        }
-        else return [];
+        return  $cars ? array_map(fn(Car $el) => $el->getResponse(), $cars) : [];
     }
 
     /**

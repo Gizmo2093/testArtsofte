@@ -6,11 +6,13 @@ namespace App\Service;
 
 use App\Entity\LoanApplication;
 use App\Interface\CreditProgramRepositoryInterface;
+use App\Interface\LoanApplicationRepositoryInterface;
 
-class CreditService
+readonly class CreditService
 {
     public function __construct(
         private CreditProgramRepositoryInterface $creditProgramRepository,
+        private LoanApplicationRepositoryInterface $loanApplicationRepository,
     )
     {
     }
@@ -20,26 +22,23 @@ class CreditService
      */
     public function getCreditProgram(int $price, float $initialPayment, int $loanTerm): ?array
     {
-        if($initialPayment == $price/2 && $loanTerm <= 5) {
-            $creditProgram = $this->creditProgramRepository->findOneById(3);
-        }
-        else if($initialPayment == $price/5 && $loanTerm > 15) {
-            $creditProgram = $this->creditProgramRepository->findOneById(1);
-        }
-        else {
-            $creditProgram = $this->creditProgramRepository->findOneById(2);
-        }
+        $creditProgramId = match (true) {
+            $initialPayment == $price / 2 && $loanTerm <= 5 => 3,
+            $initialPayment == $price / 5 && $loanTerm > 15 => 1,
+            default => 2,
+        };
 
-        return $creditProgram ?
-            [
-                'programId' => $creditProgram->getId(),
-                'interestRate' => $creditProgram->getInterestRate(),
-                'monthlyPayment' => $creditProgram->getMonthlyPayment(),
-                'title' => $creditProgram->getTitle(),
-            ] : null;
+        $creditProgram = $this->creditProgramRepository->findOneById($creditProgramId);
+
+        return $creditProgram ? [
+            'programId' => $creditProgram->getId(),
+            'interestRate' => $creditProgram->getInterestRate(),
+            'monthlyPayment' => $creditProgram->getMonthlyPayment(),
+            'title' => $creditProgram->getTitle(),
+        ] : [];
     }
 
-    public function saveLoanApplication(int $carId, int $programId, int $initialPayment, int $loanTerm): bool
+    public function saveLoanApplication(int $carId, int $programId, int $initialPayment, int $loanTerm): bool|\Exception
     {
         try {
             $loanApplication = new LoanApplication();
@@ -47,11 +46,11 @@ class CreditService
                 ->setProgramId($programId)
                 ->setInitialPayment($initialPayment)
                 ->setLoanTerm($loanTerm);
-            $this->creditProgramRepository->save($loanApplication);
+            $this->loanApplicationRepository->save($loanApplication);
             return true;
         }
         catch (\Exception $e) {
-            return false;
+            return $e;
         }
     }
 }
