@@ -7,6 +7,7 @@ namespace App\Service;
 use App\Entity\LoanApplication;
 use App\Interface\CreditProgramRepositoryInterface;
 use App\Interface\LoanApplicationRepositoryInterface;
+use Symfony\Component\HttpKernel\Log\Logger;
 
 readonly class CreditService
 {
@@ -38,7 +39,7 @@ readonly class CreditService
         ] : [];
     }
 
-    public function saveLoanApplication(int $carId, int $programId, int $initialPayment, int $loanTerm): bool|\Exception
+    public function saveLoanApplication(int $carId, int $programId, int $initialPayment, int $loanTerm): bool
     {
         try {
             $loanApplication = new LoanApplication();
@@ -50,7 +51,9 @@ readonly class CreditService
             return true;
         }
         catch (\Exception $e) {
-            return $e;
+            $logger = new Logger();
+            $logger->error($e->getMessage(), ['Error saving' => $e]);
+            return false;
         }
     }
 }
